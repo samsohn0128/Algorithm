@@ -1,4 +1,5 @@
 # Algorithm
-Algorithm Problem Solving
-
 [Baekjoon](https://www.acmicpc.net/)
+
+Baekjoon ID : samsohn0128
+
