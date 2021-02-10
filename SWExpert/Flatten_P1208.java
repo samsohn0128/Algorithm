@@ -9,7 +9,6 @@ import java.util.StringTokenizer;
 //SWExpert 1208번 덤핑 밸런스 맞추기
 public class Flatten_P1208 {
 	public static void main(String[] args) throws NumberFormatException, IOException {
-//		System.setIn(new FileInputStream("input.txt"));
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		BufferedWriter bw = new BufferedWriter(new PrintWriter(System.out));
 		for (int tc = 1; tc <= 10; tc++) {

@@ -1,9 +1,6 @@
 package SWExpert;
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.util.Arrays;
 import java.util.Stack;
 
 public class 괄호짝짓기_P1218 {
@@ -14,8 +11,6 @@ public class 괄호짝짓기_P1218 {
 	static Stack<Character> bracketStack = new Stack<>();
 	
 	public static void main(String[] args) throws Exception {
-		System.setIn(new FileInputStream("input.txt")); // input.txt로부터 입력을 받아옴
-		System.setOut(new PrintStream("myOutput.txt")); // myOutput.txt로 정답을 출력
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); // 입력을 받기위한 BufferedReader
 
 		T = 10;

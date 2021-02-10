@@ -10,12 +10,10 @@ public class Ladder1_P1210 {
 	static int[][] grid = new int[100][100];
 
 	public static void main(String[] args) throws IOException {
-//		System.setIn(new FileInputStream("input.txt"));
-//		System.setOut(new PrintStream(new FileOutputStream("output.txt")));
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
 		for (int tc = 1; tc <= 10; tc++) {
-			int tcNum = Integer.parseInt(br.readLine());
+			br.readLine();
 			int x = 0;
 			int y = 99;
 			for (int i = 0; i < 100; i++) {

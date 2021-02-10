@@ -1,7 +1,6 @@
 package Baekjoon;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.Stack;
 import java.util.StringTokenizer;
@@ -14,7 +13,6 @@ public class 탑_B2493 {
 	static Stack<Tower> towerStack = new Stack<>(); // 정답을 계산하기위한 스텍
 
 	public static void main(String[] args) throws Exception {
-		System.setIn(new FileInputStream("input.txt")); // input.txt로부터 입력을 받음
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); // 입력을 받기위한 BufferedReader
 
 		N = Integer.parseInt(br.readLine()); // 타워의 개수 입력

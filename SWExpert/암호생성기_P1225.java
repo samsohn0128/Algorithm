@@ -1,9 +1,7 @@
 package SWExpert;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.StringTokenizer;
@@ -14,8 +12,6 @@ public class 암호생성기_P1225 {
 	static Queue<Integer> numQ = new LinkedList<>();
 
 	public static void main(String[] args) throws Exception {
-		System.setIn(new FileInputStream("input.txt")); // input.txt로부터 입력을 받아옴
-		System.setOut(new PrintStream("myOutput.txt")); // myOutput.txt로 정답을 출력
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in)); // 입력을 받기위한 BufferedReader
 
 //		T = Integer.parseInt(br.readLine());

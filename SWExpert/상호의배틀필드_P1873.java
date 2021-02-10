@@ -15,8 +15,6 @@ public class 상호의배틀필드_P1873 {
 	static char[] commands;
 
 	public static void main(String[] args) throws Exception {
-//		System.setIn(new FileInputStream("input.txt"));
-//		System.setOut(new PrintStream("myOutput.txt"));
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
 		T = Integer.parseInt(br.readLine());

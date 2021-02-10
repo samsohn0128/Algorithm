@@ -1,8 +1,6 @@
 package Baekjoon;
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.StringTokenizer;
 
@@ -18,8 +16,6 @@ public class 순열_B9742 {
 	static int[] fact = new int[11];
 
 	public static void main(String[] args) throws Exception {
-		System.setIn(new FileInputStream("input.txt"));
-		System.setOut(new PrintStream("myOutput.txt"));
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
 		fact[1] = 1;
