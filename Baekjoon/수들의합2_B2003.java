@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
-public class 수들의합_B2003 {
+public class 수들의합2_B2003 {
 
 	static int N, M;
 	static int[] input;
