@@ -1,4 +1,5 @@
 package Baekjoon;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -7,11 +8,10 @@ import java.util.StringTokenizer;
 public class 치킨배달_B15686 {
 
 	static int N, M;
-
 	static ArrayList<Node> house = new ArrayList<>();
-	static int houseCnt;
 	static ArrayList<Node> chicken = new ArrayList<>();
-	static int chickenCnt;
+	static Node[] tgt;
+	static int ans = Integer.MAX_VALUE;
 
 	public static void main(String[] args) throws Exception {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -20,70 +20,59 @@ public class 치킨배달_B15686 {
 		st = new StringTokenizer(br.readLine());
 		N = Integer.parseInt(st.nextToken());
 		M = Integer.parseInt(st.nextToken());
-
-		for (int i = 1; i <= N; i++) {
+		tgt = new Node[M];
+		for (int i = 0; i < N; i++) {
 			st = new StringTokenizer(br.readLine());
-			for (int j = 1; j <= N; j++) {
-				int input = Integer.parseInt(st.nextToken());
-				if (input == 1) {
+			for (int j = 0; j < N; j++) {
+				int num = Integer.parseInt(st.nextToken());
+				if (num == 1)
 					house.add(new Node(i, j));
-					houseCnt++;
-				} else if (input == 2) {
+				else if (num == 2)
 					chicken.add(new Node(i, j));
-					chickenCnt++;
-				}
 			}
 		}
-
-		if (chickenCnt < M) {
-			System.out.println();
-		} else {
-			ArrayList<Node> list = new ArrayList<>();
-			System.out.println(comb(0, list));
-		}
+		comb(0, 0);
+		System.out.println(ans);
 
 		br.close();
 	}
 
-	static int comb(int idx, ArrayList<Node> list) {
-		int min = Integer.MAX_VALUE;
-		if (list.size() == M) {
-			return getMinDist(list);
-		}
-		if (idx == chickenCnt) {
-			return min;
+	static void comb(int srcIdx, int tgtIdx) {
+		if (tgtIdx == M) {
+			int sum = 0;
+			for (Node n : house)
+				sum += getMinDist(n);
+			ans = Math.min(ans, sum);
+			return;
 		}
 
-		list.add(chicken.get(idx));
-		min = Math.min(min, comb(idx + 1, list));
-		list.remove(chicken.get(idx));
-		min = Math.min(min, comb(idx + 1, list));
+		if (srcIdx == chicken.size())
+			return;
+
+		comb(srcIdx + 1, tgtIdx);
+		tgt[tgtIdx] = chicken.get(srcIdx);
+		comb(srcIdx + 1, tgtIdx + 1);
+	}
+
+	static int getMinDist(Node n) {
+		int min = Integer.MAX_VALUE;
+		for (int i = 0; i < M; i++) {
+			min = Math.min(min, getDist(n, tgt[i]));
+		}
 		return min;
 	}
 
-	static int getMinDist(ArrayList<Node> list) {
-		int ret = 0;
-		for (Node n1 : house) {
-			int min = Integer.MAX_VALUE;
-			for (Node n2 : list) {
-				min = Math.min(min, getDist(n1, n2));
-			}
-			ret += min;
-		}
-		return ret;
-	}
-
 	static int getDist(Node n1, Node n2) {
-		return Math.abs(n1.y - n2.y) + Math.abs(n1.x - n2.x);
+		return Math.abs(n1.r - n2.r) + Math.abs(n1.c - n2.c);
 	}
 
 	static class Node {
-		int y;
-		int x;
+		int r;
+		int c;
 
-		public Node(int y, int x) {
-			this.y = y;
-			this.x = x;
+		public Node(int r, int c) {
+			this.r = r;
+			this.c = c;
 		}
 	}
 }

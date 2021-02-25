@@ -113,10 +113,6 @@ public class 캐슬디펜스_B17135 {
 		return Math.abs(n1.y - n2.y) + Math.abs(n1.x - n2.x);
 	}
 
-	static int dist(int r1, int c1, int r2, int c2) {
-		return Math.abs(r1 - r2) + Math.abs(c1 - c2);
-	}
-
 	static class Node {
 		int id;
 		int y;
