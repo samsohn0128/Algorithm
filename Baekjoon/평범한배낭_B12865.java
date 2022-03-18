@@ -1,39 +1,55 @@
-package Baekjoon;
-
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
 public class 평범한배낭_B12865 {
 
-	static int N, K;
-	static int[] W = new int[101], V = new int[101];
-	static int[][] dp = new int[101][100001];
+    private static int N, K;
+    private static Stuff[] stuffs;
+    private static int[][] maxValue;
 
-	public static void main(String[] args) throws Exception {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st;
+    public static void main(String[] args) throws Exception {
+        init();
+        for (int i = 1; i <= N; i++) {
+            for (int j = 0; j <= K; j++) {
+                if (j - stuffs[i].weight >= 0) {
+                    maxValue[i][j] = Math.max(maxValue[i - 1][j], maxValue[i - 1][j - stuffs[i].weight] + stuffs[i].value);
+                } else {
+                    maxValue[i][j] = maxValue[i - 1][j];
+                }
+            }
+        }
+        int answer = 0;
+        for (int i = 1; i <= N; i++) {
+            answer = Math.max(answer, maxValue[i][K]);
+        }
+        System.out.println(answer);
+    }
 
-		st = new StringTokenizer(br.readLine());
-		N = Integer.parseInt(st.nextToken());
-		K = Integer.parseInt(st.nextToken());
-		for (int i = 1; i <= N; i++) {
-			st = new StringTokenizer(br.readLine());
-			W[i] = Integer.parseInt(st.nextToken());
-			V[i] = Integer.parseInt(st.nextToken());
-		}
+    private static void init() throws Exception {
+        System.setIn(new FileInputStream("input.txt"));
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        N = Integer.parseInt(st.nextToken());
+        K = Integer.parseInt(st.nextToken());
+        stuffs = new Stuff[N + 1];
+        maxValue = new int[N + 1][K + 1];
+        for (int i = 1; i <= N; i++) {
+            st = new StringTokenizer(br.readLine());
+            int W = Integer.parseInt(st.nextToken());
+            int V = Integer.parseInt(st.nextToken());
+            stuffs[i] = new Stuff(W, V);
+        }
+    }
 
-		for (int i = 1; i <= N; i++) {
-			for (int j = 0; j <= K; j++) {
-				if (j < W[i])
-					dp[i][j] = dp[i - 1][j];
-				else {
-					dp[i][j] = Math.max(dp[i - 1][j], dp[i - 1][j - W[i]] + V[i]);
-				}
-			}
-		}
-		System.out.println(dp[N][K]);
+    private static class Stuff {
+        private int weight;
+        private int value;
 
-		br.close();
-	}
+        public Stuff(int weight, int value) {
+            this.weight = weight;
+            this.value = value;
+        }
+    }
 }
