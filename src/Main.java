@@ -8,10 +8,12 @@ public class Main {
         System.setIn(new FileInputStream("input.txt"));
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         init(br);
+
+
         br.close();
     }
 
     private static void init(BufferedReader br) throws Exception {
-        
+
     }
 }

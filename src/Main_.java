@@ -8,6 +8,8 @@ public class Main_ {
         System.setIn(new FileInputStream("input.txt"));
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         init(br);
+
+        
         br.close();
     }
 
