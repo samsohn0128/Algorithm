@@ -16,5 +16,6 @@ public class Main {
     }
 
     private static void init(BufferedReader br) throws Exception {
+
     }
 }
