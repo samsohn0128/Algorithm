@@ -3,7 +3,6 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 
 public class Main {
-
     public static void main(String[] args) throws Exception {
         BufferedReader br = setBufferedReader();
         init(br);
@@ -16,6 +15,5 @@ public class Main {
     }
 
     private static void init(BufferedReader br) throws Exception {
-
     }
 }
