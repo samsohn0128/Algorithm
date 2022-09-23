@@ -4,7 +4,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Main {
+public class 이진검색트리_B5639 {
 
     private static List<Integer> numberList = new ArrayList<>();
     private static Tree tree;
