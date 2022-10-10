@@ -4,7 +4,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Main {
+public class 일로만들기2_B12582 {
 
     private static int N;
     private static List<Integer>[] leastOperatorCounts;
