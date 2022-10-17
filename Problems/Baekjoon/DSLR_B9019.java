@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.StringTokenizer;
 
-public class Main {
+public class DSLR_B9019 {
     private static BufferedReader br;
     private static int T;
     private static String srcNumber, tgtNumber;
