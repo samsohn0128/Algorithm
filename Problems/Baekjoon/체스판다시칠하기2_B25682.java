@@ -3,7 +3,7 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
-public class Main {
+public class 체스판다시칠하기2_B25682 {
     private static BufferedReader br;
     private static int N, M, K;
     private static char[][] chessBoardStartWithBlack, chessBoardStartWithWhite;
