@@ -1,27 +1,17 @@
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.util.StringTokenizer;
 
-public class Main {
-
+public class 코딩은체육과목입니다_B25314 {
     public static void main(String[] args) throws Exception {
-        init();
-        String answer = solution();
-        System.out.println(answer);
-    }
-
-    private static void init() throws Exception {
         System.setIn(new FileInputStream("input.txt"));
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st;
-
-        br.close();
-    }
-
-    private static String solution() {
         StringBuilder sb = new StringBuilder();
-        return sb.toString();
+        int N = Integer.parseInt(br.readLine());
+        for (int i = 0; i < N / 4; i++) {
+            sb.append("long ");
+        }
+        sb.append("int");
+        System.out.println(sb);
     }
-
 }
