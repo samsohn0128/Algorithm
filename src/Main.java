@@ -2,16 +2,15 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Main {
-    private static final int[] dy = {0, -1, 1, 0, 0};
-    private static final int[] dx = {0, 0, 0, 1, -1};
-    private static final int[] nextDirection = {0, 2, 1, 4, 3};
-    private static int R, C, M;
-    private static List<Shark> sharkList = new LinkedList<>();
-    private static int[][] sharksCountMap;
-    private static int fishermanX = 0;
+    private static final int WALL = -100;
+    private static final int[] treeDy = {-1, 1, 0, 0};
+    private static final int[] treeDx = {0, 0, -1, 1};
+    private static final int[] herbicideDy = {-1, -1, 1, 1};
+    private static final int[] herbicideDx = {-1, 1, -1, 1};
+    private static int N, M, K, C;
+    private static int[][] map;
 
     public static void main(String[] args) throws Exception {
         init();
@@ -23,122 +22,221 @@ public class Main {
         System.setIn(new FileInputStream("input.txt"));
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
-        R = Integer.parseInt(st.nextToken());
-        C = Integer.parseInt(st.nextToken());
+        N = Integer.parseInt(st.nextToken());
         M = Integer.parseInt(st.nextToken());
-        sharksCountMap = new int[R + 1][C + 1];
-        for (int i = 0; i < M; i++) {
+        K = Integer.parseInt(st.nextToken());
+        C = Integer.parseInt(st.nextToken());
+        map = new int[N][N];
+        for (int i = 0; i < N; i++) {
             st = new StringTokenizer(br.readLine());
-            int y = Integer.parseInt(st.nextToken());
-            int x = Integer.parseInt(st.nextToken());
-            int speed = Integer.parseInt(st.nextToken());
-            int direction = Integer.parseInt(st.nextToken());
-            int size = Integer.parseInt(st.nextToken());
-            sharkList.add(new Shark(y, x, speed, direction, size));
+            for (int j = 0; j < N; j++) {
+                map[i][j] = Integer.parseInt(st.nextToken());
+                if (map[i][j] == -1) {
+                    map[i][j] = WALL;
+                }
+            }
         }
     }
 
     private static int solution() {
         int answer = 0;
-        while (fishermanX <= C) {
-            fishermanX++;
-            if (fishermanX > C) {
-                break;
-            }
-            answer += catchClosestShark();
-            moveAllSharks();
+//        printMap();
+        for (int i = 0; i < M; i++) {
+            growAndPropagateTrees();
+//            printMap();
+            reduceHerbicide();
+            answer += putHerbicide();
+//            printMap();
         }
         return answer;
     }
 
-    private static int catchClosestShark() {
-        Optional<Shark> caughtShark = sharkList.stream()
-                .filter(shark -> shark.x == fishermanX)
-                .min(Comparator.comparingInt(shark -> shark.y));
-
-        if (caughtShark.isPresent()) {
-            sharkList.remove(caughtShark.get());
-            return caughtShark.get().size;
-        } else {
-            return 0;
+    private static void growAndPropagateTrees() {
+        Queue<Node> treeQueue = growAndGetTrees();
+        Queue<Tree> propagatedTreeQueue = new LinkedList<>();
+        while (!treeQueue.isEmpty()) {
+            Node tree = treeQueue.poll();
+            propagatedTreeQueue.addAll(propagateTree(tree));
+        }
+        while (!propagatedTreeQueue.isEmpty()) {
+            Tree tree = propagatedTreeQueue.poll();
+            map[tree.y][tree.x] += tree.numberOfTrees;
         }
     }
 
-    private static void moveAllSharks() {
-        for (int[] ints : sharksCountMap) {
-            Arrays.fill(ints, 0);
-        }
-        sharkList.forEach(Main::moveShark);
-        eatSharks();
-    }
-
-    private static void moveShark(Shark shark) {
-        int ny = shark.y + dy[shark.direction] * shark.speed;
-        int nx = shark.x + dx[shark.direction] * shark.speed;
-
-        while (ny <= 0 || R < ny) {
-            if (ny > R) {
-                ny = R - (ny - R);
-            } else {
-                ny = -ny + 2;
-            }
-            shark.direction = nextDirection[shark.direction];
-        }
-
-        while (nx <= 0 || nx > C) {
-            if (nx > C) {
-                nx = C - (nx - C);
-            } else {
-                nx = -nx + 2;
-            }
-            shark.direction = nextDirection[shark.direction];
-        }
-
-        shark.y = ny;
-        shark.x = nx;
-        sharksCountMap[shark.y][shark.x]++;
-    }
-
-    private static void eatSharks() {
-        List<Shark> eatenSharkList = new LinkedList<>();
-        for (int i = 1; i <= R; i++) {
-            for (int j = 1; j <= C; j++) {
-                if (sharksCountMap[i][j] > 1) {
-                    int finalI = i;
-                    int finalJ = j;
-                    List<Shark> sameCellSharkList = sharkList.stream()
-                            .filter(shark -> shark.y == finalI && shark.x == finalJ)
-                            .collect(Collectors.toList());
-                    int maxSize = sameCellSharkList.stream()
-                            .max(Comparator.comparingInt(shark -> shark.size))
-                            .orElseThrow()
-                            .size;
-                    eatenSharkList.addAll(sameCellSharkList.stream()
-                            .filter(shark -> shark.size != maxSize)
-                            .collect(Collectors.toList()));
+    private static Queue<Node> growAndGetTrees() {
+        Queue<Node> treeQueue = new LinkedList<>();
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                if (map[i][j] > 0) {
+                    map[i][j] += countAdjacentTrees(i, j);
+                    treeQueue.offer(new Node(i, j));
                 }
             }
         }
-        sharkList.removeAll(eatenSharkList);
+        return treeQueue;
     }
 
-    private static boolean isSharksInSameCell(Shark shark1, Shark shark2) {
-        return shark1.y == shark2.y && shark1.x == shark2.x;
+    private static int countAdjacentTrees(int y, int x) {
+        int adjacentTreeCount = 0;
+        for (int i = 0; i < 4; i++) {
+            int ny = y + treeDy[i];
+            int nx = x + treeDx[i];
+            if (isInMap(ny, nx) && map[ny][nx] > 0) {
+                adjacentTreeCount++;
+            }
+        }
+        return adjacentTreeCount;
     }
 
-    private static class Shark {
-        private int y;
-        private int x;
-        private int speed;
-        private int direction;
-        private int size;
+    private static List<Tree> propagateTree(Node tree) {
+        List<Tree> propagatedTreeList = new ArrayList<>();
+        int availableCellCount = countAvailableCells(tree);
+        for (int i = 0; i < 4; i++) {
+            int ny = tree.y + treeDy[i];
+            int nx = tree.x + treeDx[i];
+            if (isInMap(ny, nx) && map[ny][nx] == 0) {
+                propagatedTreeList.add(new Tree(ny, nx, map[tree.y][tree.x] / availableCellCount));
+            }
+        }
+        return propagatedTreeList;
+    }
 
-        public Shark(int y, int x, int speed, int direction, int size) {
+    private static int countAvailableCells(Node tree) {
+        int availableCellCount = 0;
+        for (int i = 0; i < 4; i++) {
+            int ny = tree.y + treeDy[i];
+            int nx = tree.x + treeDx[i];
+            if (isInMap(ny, nx) && map[ny][nx] == 0) {
+                availableCellCount++;
+            }
+        }
+        return availableCellCount;
+    }
+
+    private static void reduceHerbicide() {
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                if (WALL < map[i][j] && map[i][j] < 0) {
+                    map[i][j]++;
+                }
+            }
+        }
+    }
+
+    private static int putHerbicide() {
+        Tree maxKillingCell = findMaxKillingCell();
+        if (maxKillingCell.numberOfTrees == 0) {
+            return 0;
+        }
+        int killingCount = map[maxKillingCell.y][maxKillingCell.x];
+        map[maxKillingCell.y][maxKillingCell.x] = -C;
+        for (int i = 0; i < 4; i++) {
+            for (int j = 1; j <= K; j++) {
+                int ny = maxKillingCell.y + herbicideDy[i] * j;
+                int nx = maxKillingCell.x + herbicideDx[i] * j;
+
+                if (isInMap(ny, nx)) {
+                    if (map[ny][nx] > 0) {
+                        killingCount += map[ny][nx];
+                    } else if (map[ny][nx] > WALL) {
+                        map[ny][nx] = -C;
+                        break;
+                    } else {
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
+        }
+        return killingCount;
+    }
+
+    private static Tree findMaxKillingCell() {
+        Tree maxKillingCell = new Tree(0, 0, 0);
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                if (map[i][j] > 0) {
+                    int killingCount = countKillingTrees(i, j);
+                    if (killingCount > maxKillingCell.numberOfTrees) {
+                        maxKillingCell.numberOfTrees = killingCount;
+                        maxKillingCell.y = i;
+                        maxKillingCell.x = j;
+                    }
+                }
+            }
+        }
+        return maxKillingCell;
+    }
+
+    private static int countKillingTrees(int y, int x) {
+        int killingCount = map[y][x];
+        for (int i = 0; i < 4; i++) {
+            for (int j = 1; j <= K; j++) {
+                int ny = y + herbicideDy[i] * j;
+                int nx = x + herbicideDx[i] * j;
+                if (isInMap(ny, nx) && map[ny][nx] > 0) {
+                    killingCount += map[ny][nx];
+                } else {
+                    break;
+                }
+            }
+        }
+        return killingCount;
+    }
+
+    private static boolean isInMap(int y, int x) {
+        return 0 <= y && y < N && 0 <= x && x < N;
+    }
+
+    private static class Node {
+        int y;
+        int x;
+
+        public Node(int y, int x) {
             this.y = y;
             this.x = x;
-            this.speed = speed;
-            this.direction = direction;
-            this.size = size;
         }
+
+        @Override
+        public String toString() {
+            return "Node{" +
+                    "y=" + y +
+                    ", x=" + x +
+                    '}';
+        }
+    }
+
+    private static class Tree extends Node {
+        int numberOfTrees;
+
+        public Tree(int y, int x, int numberOfTrees) {
+            super(y, x);
+            this.numberOfTrees = numberOfTrees;
+        }
+
+        @Override
+        public String toString() {
+            return "Tree{" +
+                    "numberOfTrees=" + numberOfTrees +
+                    ", y=" + y +
+                    ", x=" + x +
+                    '}';
+        }
+    }
+
+    private static void printMap() {
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                if (map[i][j] == WALL) {
+                    System.out.print("**\t\t");
+                } else {
+                    System.out.print(map[i][j] + "\t\t");
+                }
+            }
+            System.out.println();
+        }
+        System.out.println();
     }
 }
