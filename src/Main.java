@@ -15,7 +15,7 @@ public class Main {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     }
 
-    private static long solution() {
+    private static int solution() {
         return 0;
     }
 }

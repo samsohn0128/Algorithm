@@ -17,7 +17,7 @@ public class Solution {
     }
 
     private static void init(BufferedReader br) throws Exception {
-
+        
     }
 
     private static int solution() {
