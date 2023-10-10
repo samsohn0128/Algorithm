@@ -41,7 +41,6 @@ public class Main {
             //맵 두개를 왔다 갔다 하기 위해 다음 맵 초기화
             initMap();
             sort(maxColumnSize >= maxRowSize);
-
             time++;
         }
         return isSucceed() ? time : -1;
