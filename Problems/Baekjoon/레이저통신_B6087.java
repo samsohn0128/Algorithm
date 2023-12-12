@@ -1,37 +1,72 @@
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.StringTokenizer;
 
-public class 레이저통신_B6087 {
+public class Main {
+    private static final int[] dy = {-1, 0, 1, 0};
+    private static final int[] dx = {0, -1, 0, 1};
     private static int W, H;
     private static char[][] map;
-    private static int[][] minNumberOfMirrors;
     private static Node start, end;
-    private static final int[] dy = {-1, 1, 0, 0};
-    private static final int[] dx = {0, 0, -1, 1};
+    private static int[][] mirrors;
+    private static int[][] directions;
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws IOException {
         init();
-        String answer = solution();
-        System.out.println(answer);
+        bfs();
+        printDirections();
+        System.out.println(mirrors[end.y][end.x]);
     }
 
-    private static void init() throws Exception {
+    private static void bfs() {
+        PriorityQueue<Node> pq = new PriorityQueue<>(Comparator.comparingInt(node -> node.mirrorCount));
+        mirrors[start.y][start.x] = -1;
+        directions[start.y][start.x] = -1;
+        pq.offer(new Node(start.y, start.x, -1, -1));
+        while (!pq.isEmpty()) {
+            Node node = pq.poll();
+            for (int d = 0; d < 4; d++) {
+                int ny = node.y + dy[d];
+                int nx = node.x + dx[d];
+                if (isInMap(ny, nx) && mirrors[ny][nx] >= node.mirrorCount && map[ny][nx] != '*') {
+                    int nextMirrorCount = node.mirrorCount + (node.direction == d ? 0 : 1);
+                    if (mirrors[ny][nx] >= nextMirrorCount) {
+                        if (mirrors[ny][nx] > nextMirrorCount || directions[ny][nx] != d) {
+                            mirrors[ny][nx] = nextMirrorCount;
+                            pq.offer(new Node(ny, nx, d, nextMirrorCount));
+                            directions[ny][nx] = d;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private static boolean isInMap(int y, int x) {
+        return 0 <= y && y < H && 0 <= x && x < W;
+    }
+
+    private static void init() throws IOException {
         System.setIn(new FileInputStream("input.txt"));
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-
         StringTokenizer st = new StringTokenizer(br.readLine());
         W = Integer.parseInt(st.nextToken());
         H = Integer.parseInt(st.nextToken());
         map = new char[H][W];
-        minNumberOfMirrors = new int[H][W];
+        mirrors = new int[H][W];
+        directions = new int[H][W];
+        for (int i = 0; i < H; i++) {
+            Arrays.fill(mirrors[i], Integer.MAX_VALUE);
+            Arrays.fill(directions[i], Integer.MAX_VALUE);
+        }
         for (int i = 0; i < H; i++) {
             map[i] = br.readLine().toCharArray();
             for (int j = 0; j < W; j++) {
-                minNumberOfMirrors[i][j] = -1;
                 if (map[i][j] == 'C') {
                     if (start == null) {
                         start = new Node(i, j);
@@ -41,71 +76,56 @@ public class 레이저통신_B6087 {
                 }
             }
         }
-
-        br.close();
     }
 
-    private static String solution() {
-        StringBuilder sb = new StringBuilder();
-
-        PriorityQueue<Node> pq = new PriorityQueue<>(Comparator.comparingInt(node -> node.numberOfMirrors));
-
-        pq.offer(start);
-        minNumberOfMirrors[start.y][start.x] = 0;
-        while (!pq.isEmpty()) {
-            Node temp = pq.poll();
-            for (int i = 0; i < 4; i++) {
-                int ny = temp.y + dy[i];
-                int nx = temp.x + dx[i];
-                if (isInMap(ny, nx)) {
-                    if (map[ny][nx] == '.' || map[ny][nx] == 'C') {
-                        int numberOfMirrors = calculateNextNumberOfMirrors(temp, i);
-                        if (minNumberOfMirrors[ny][nx] == -1) {
-                            minNumberOfMirrors[ny][nx] = numberOfMirrors;
-                            pq.offer(new Node(ny, nx, i, numberOfMirrors));
-                        } else {
-                            if (minNumberOfMirrors[ny][nx] >= numberOfMirrors) {
-                                minNumberOfMirrors[ny][nx] = numberOfMirrors;
-                                pq.offer(new Node(ny, nx, i, numberOfMirrors));
-                            }
-                        }
-
-                    }
+    private static void printDirections() {
+        for (int i = 0; i < H; i++) {
+            for (int j = 0; j < W; j++) {
+                System.out.print(map[i][j] + "\t");
+            }
+            System.out.println();
+        }
+        System.out.println();
+        for (int i = 0; i < H; i++) {
+            for (int j = 0; j < W; j++) {
+                if (directions[i][j] == Integer.MAX_VALUE) {
+                    System.out.print("-\t");
+                } else {
+                    System.out.print(directions[i][j] + "\t");
                 }
             }
+            System.out.println();
         }
-        sb.append(minNumberOfMirrors[end.y][end.x]);
-        return sb.toString();
-    }
-
-    private static int calculateNextNumberOfMirrors(Node node, int direction) {
-        int numberOfMirrors = node.numberOfMirrors;
-        if (node.direction != -1 && node.direction != direction) {
-            numberOfMirrors++;
+        System.out.println();
+        for (int i = 0; i < H; i++) {
+            for (int j = 0; j < W; j++) {
+                if (mirrors[i][j] == Integer.MAX_VALUE) {
+                    System.out.print("-\t");
+                } else {
+                    System.out.print(mirrors[i][j] + "\t");
+                }
+            }
+            System.out.println();
         }
-        return numberOfMirrors;
-    }
-
-    private static boolean isInMap(int y, int x) {
-        return 0 <= y && y < H && 0 <= x && x < W;
+        System.out.println();
     }
 
     private static class Node {
-        private int y;
-        private int x;
-        private int direction = -1;
-        private int numberOfMirrors;
+        int y;
+        int x;
+        int direction;
+        int mirrorCount;
+
+        public Node(int y, int x, int direction, int mirrorCount) {
+            this.y = y;
+            this.x = x;
+            this.direction = direction;
+            this.mirrorCount = mirrorCount;
+        }
 
         public Node(int y, int x) {
             this.y = y;
             this.x = x;
-        }
-
-        public Node(int y, int x, int direction, int numberOfMirrors) {
-            this.y = y;
-            this.x = x;
-            this.direction = direction;
-            this.numberOfMirrors = numberOfMirrors;
         }
     }
 }
